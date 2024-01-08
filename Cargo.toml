@@ -1,0 +1,59 @@
+# https://rustwiki.org/zh-CN/cargo/reference/manifest.html#the-package-section
+[package]
+name = "rust-github-action-test"
+version = "0.1.0"
+edition = "2021"
+author = ["ddki <ddki2068@gmail.com>"]
+build = "build.rs"
+# 关于包的简短介绍. 这不会以任何格式呈现
+# 到 crates.io (又名 这不是markdown).
+description = "..."
+
+# 这些URL指向有关包的更多信息 这些是
+# 旨在成为相关数据的网页入口， 不一定兼容
+# VCS工具(类似的)等.
+documentation = "..."
+homepage = "..."
+repository = "..."
+
+# 这指向包根目录下的文件 (与 `Cargo.toml` 相对的).
+# 该文件的内容会存储，并在注册表中编入索引。
+# crates.io 将渲染此文件，并将结果放在包的页面上.
+readme = "..."
+
+# 这是一个，最多五个描述此箱的关键字的列表. 关键词
+# 可以在 crates.io 上搜索, 和你可以选择任何单词
+# 帮助别人找到这个箱子。
+keywords = ["...", "..."]
+
+# 这是此箱子最适合的(最多五个)类别的列表.
+# 类别是 crates.io/category_slugs 上可用的固定列表, 和
+# 他们必须完全匹配.
+categories = ["...", "..."]
+
+# 这是此包的SPDX 2.1许可证表达式.  目前
+# crates.io将根据白名单的已知许可证和SPDX许可证列表2.4中的异常标识符，
+# 验证提供的许可证。目前不支持括号。
+#
+# 使用AND和OR的许可证表达式
+# 运算符以获得更明确的语义。
+license = "GPL-3.0"
+
+# 如果程序包使用非标准许可证, 则可以指定此 key
+# 代替上述 key 和 必须指向相对于此清单的文件
+# (类似于 readme key).
+license-file = "LICENSE"
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[dev-dependencies]
+clippy = "0.0.302"
+rustfmt = "0.10.0"
+rusty-hook = "0.11.2"
+
+[build-dependencies]
+cargo-make = "0.37.5"
+cross = "0.2.5"
