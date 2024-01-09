@@ -80,7 +80,6 @@ The following tools were used in this project:
 - [rusty-hooks](https://github.com/rusty-hook)
 - [cargo-make](https://sagiegurari.github.io/cargo-make/)
 - [Clippy](https://github.com/rust-lang/rust-clippy)
-- [cross](https://github.com/cross-rs/cross)
 
 ## :white_check_mark: Requirements ##
 
@@ -89,9 +88,6 @@ Before starting :checkered_flag:, you need to have [Git](https://git-scm.com) an
 Rust toolchain: stable-x86_64-pc-windows-msvc;
 
 ```bash
-# install cross 
-cargo install cross --git https://github.com/cross-rs/cross
-
 # install cargo-make 
 cargo install --force cargo-make
 

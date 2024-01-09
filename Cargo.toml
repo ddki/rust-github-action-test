@@ -56,4 +56,3 @@ rusty-hook = "0.11.2"
 
 [build-dependencies]
 cargo-make = "0.37.5"
-cross = "0.2.5"
