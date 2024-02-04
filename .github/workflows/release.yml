@@ -31,6 +31,8 @@ jobs:
   build:
     name: build ${{ matrix.target }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -46,6 +48,8 @@ jobs:
       - name: Compile and build
         id: compile
         uses: rust-build/rust-build.action@v1.4.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           RUSTTARGET: ${{ matrix.target }}
           ARCHIVE_TYPES: ${{ matrix.archive }}
@@ -60,5 +64,12 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ steps.compile.outputs.BUILT_ARCHIVE }}
+          tag: ${{ github.ref }}
+          overwrite: true
+      - name: Upload checksum to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ steps.compile.outputs.BUILT_CHECKSUM }}
           tag: ${{ github.ref }}
           overwrite: true
