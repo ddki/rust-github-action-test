@@ -4,10 +4,30 @@ on:
     tags:
       - 'v*'
 
-permissions:
-  contents: write
-
 jobs:
+
+  create-release:
+    name: create release job
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: generate changelog
+        uses: orhun/git-cliff-action@v2
+        id: git-cliff
+        with: 
+          config: cliff.toml
+          args: -vv --latest
+        env:
+          OUTPUT: CHANGELOG.md
+      - name: create release
+        uses: ncipollo/release-action@v1
+        with:
+          bodyFile: ${{ steps.git-cliff.outputs.content }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+  
   build:
     name: build ${{ matrix.target }}
     runs-on: ubuntu-latest
@@ -31,10 +51,12 @@ jobs:
           ARCHIVE_TYPES: ${{ matrix.archive }}
           TOOLCHAIN_VERSION: stable
           UPLOAD_MODE: none
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          name: Binary
-          path: |
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: |
             ${{ steps.compile.outputs.BUILT_ARCHIVE }}
             ${{ steps.compile.outputs.BUILT_CHECKSUM }}
+          tag: ${{ github.ref }}
+          overwrite: true
