@@ -51,6 +51,10 @@ jobs:
           ARCHIVE_TYPES: ${{ matrix.archive }}
           TOOLCHAIN_VERSION: stable
           UPLOAD_MODE: none
+      - name: echo rust-build out
+        run: |
+          echo 'BUILT_ARCHIVE = ' + ${{ steps.compile.outputs.BUILT_ARCHIVE }}
+          echo 'BUILT_CHECKSUM = ' + ${{ steps.compile.outputs.BUILT_CHECKSUM }}
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
