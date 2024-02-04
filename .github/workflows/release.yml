@@ -55,8 +55,6 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: |
-            ${{ steps.compile.outputs.BUILT_ARCHIVE }}
-            ${{ steps.compile.outputs.BUILT_CHECKSUM }}
+          file: ${{ steps.compile.outputs.BUILT_ARCHIVE }}
           tag: ${{ github.ref }}
           overwrite: true
