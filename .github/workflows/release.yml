@@ -1,19 +1,19 @@
-name: Publish
+name: Release
+
+permissions:
+  contents: write
+
 on:
   push:
     tags:
-      - 'v*'
+      - v[0-9]+.*
 
 jobs:
-
   create-release:
-    name: create release job
+    name: create-release job
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: generate changelog
         uses: orhun/git-cliff-action@v2
         id: git-cliff
@@ -27,49 +27,49 @@ jobs:
         with:
           body: ${{ steps.git-cliff.outputs.content }}
           token: ${{ secrets.GITHUB_TOKEN }}
-  
-  build:
-    name: build ${{ matrix.target }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
+  upload-assets:
+    needs: create-release
     strategy:
-      fail-fast: false
       matrix:
-        include:
-          - target: x86_64-pc-windows-gnu
-            archive: zip
-          - target: x86_64-unknown-linux-musl
-            archive: tar.gz tar.xz tar.zst
-          - target: x86_64-apple-darwin
-            archive: zip
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@master
-      - name: Compile and build
-        id: compile
-        uses: rust-build/rust-build.action@v1.4.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+      - name: Get binary name
+        uses: dangdennis/toml-action@v1.3.0
+        id: read_cargo_toml
         with:
-          RUSTTARGET: ${{ matrix.target }}
-          ARCHIVE_TYPES: ${{ matrix.archive }}
-          TOOLCHAIN_VERSION: stable
-          UPLOAD_MODE: none
-      - name: echo rust-build out
-        run: |
-          echo 'BUILT_ARCHIVE = ' + ${{ steps.compile.outputs.BUILT_ARCHIVE }}
-          echo 'BUILT_CHECKSUM = ' + ${{ steps.compile.outputs.BUILT_CHECKSUM }}
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+          file: "Cargo.toml"
+          field: "package.name"
+      - uses: taiki-e/upload-rust-binary-action@v1
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ steps.compile.outputs.BUILT_ARCHIVE }}
-          tag: ${{ github.ref }}
-          overwrite: true
-      - name: Upload checksum to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ steps.compile.outputs.BUILT_CHECKSUM }}
-          tag: ${{ github.ref }}
-          overwrite: true
+          # (required) Comma-separated list of binary names (non-extension portion of filename) to build and upload.
+          # Note that glob pattern is not supported yet.
+          bin: ${{ steps.read_cargo_toml.outputs.value }}
+          # (optional) Archive name (non-extension portion of filename) to be uploaded.
+          # [default value: $bin-$target]
+          # [possible values: the following variables and any string]
+          #   variables:
+          #     - $bin    - Binary name (non-extension portion of filename).
+          #     - $target - Target triple.
+          #     - $tag    - Tag of this release.
+          # When multiple binary names are specified, default archive name or $bin variable cannot be used.
+          archive: $bin-$tag-$target
+          # (optional) On which platform to distribute the `.tar.gz` file.
+          # [default value: unix]
+          # [possible values: all, unix, windows, none]
+          tar: unix
+          # (optional) On which platform to distribute the `.zip` file.
+          # [default value: windows]
+          # [possible values: all, unix, windows, none]
+          zip: windows
+          # Comma-separated list of algorithms to be used for checksum (sha256, sha512, sha1, or md5)
+          checksum: sha256
+          # Comma-separated list of additional files to be included to the archive
+          include: README.md,LICENSE
+          # (required) GitHub token for uploading assets to GitHub Releases.
+          token: ${{ secrets.GITHUB_TOKEN }}
