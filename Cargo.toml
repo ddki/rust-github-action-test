@@ -50,9 +50,10 @@ license-file = "LICENSE"
 [dependencies]
 
 [dev-dependencies]
+cargo-edit = "0.12.2"
 clippy = "0.0.302"
 rustfmt = "0.10.0"
 rusty-hook = "0.11.2"
 
 [build-dependencies]
-cargo-make = "0.37.5"
+cargo-make = "0.37.12"

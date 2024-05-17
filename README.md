@@ -94,6 +94,8 @@ cargo install --force cargo-make
 # install clippy
 rustup component add clippy
 
+# upgrade dependencies version
+cargo upgrade
 ```
 
 ## :checkered_flag: Starting ##
